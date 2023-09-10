@@ -145,7 +145,7 @@ export default function Dashboard() {
                     height: 240,
                   }}
                 >
-                  <Chart />
+                  <Chart portfolioData={myArray}/>
                 </Paper>
               </Grid>
               {/* Recent Deposits */}

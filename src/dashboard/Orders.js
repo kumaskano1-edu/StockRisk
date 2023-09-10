@@ -35,7 +35,7 @@ export default function Orders() {
           {myArray.map((row, index) => (
             <TableRow key={index}>
               <TableCell>{row.symbol}</TableCell>
-              <TableCell>{row.name}</TableCell>
+              <TableCell>{row.description}</TableCell>
               <TableCell>{row.type}</TableCell>
               <TableCell align="right"><Button onClick={() => onRemoveClick(row.symbol)}>Remove</Button></TableCell>
             </TableRow>

@@ -9,21 +9,22 @@ export default function Deposits() {
   const [count, setCount] = useState()
   useEffect( () => {
     async function fetchData() {
+      let betaPercentage = 0
+      let maxBeta = 2
+      let minBeta = 0.5
+      let totalBeta = 0;
       if(myArray.length > 0) {
-        const apiKey = 'cjuao3hr01qlodk31tq0cjuao3hr01qlodk31tqg';
-        https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=cjuao3hr01qlodk31tq0cjuao3hr01qlodk31tqg
-        // let data = await fetch(`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${apiKey}`).
-        //   then((res) => res.json())
-        //   let invidualBeta = data.Beta
-
-        // for(const stock of myArray) {
-        //   let symbol = stock.symbol
-        //   let data = await fetch(`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${apiKey}`).
-        //   then((res) => res.json())
-          
-        // }
-        return
+        //calculate each weighted beta 
+        myArray.map((invidualStock) => {
+          let singleBeta = invidualStock.metric.beta
+          let singleWeightedBeta = singleBeta * (1 / myArray.length)
+          //calculate totalBeta
+          totalBeta = totalBeta + singleWeightedBeta
+        })
       }
+      //calculate the normalized percentage 
+      betaPercentage = 100 * ((totalBeta - minBeta) / (maxBeta - minBeta))
+      setCount(Math.floor(betaPercentage))
     }
     fetchData()
 }, [myArray]);
@@ -31,13 +32,12 @@ export default function Deposits() {
     <React.Fragment>
       <Title>Portfolio Risk</Title>
       <Typography component="p" variant="h4">
-        {count}
+        {count}%
       </Typography>
-      <Typography color="text.secondary" sx={{ flex: 1 }}>
-        on 15 March, 2019
+      <Typography color="text.secondary">
+        Risk compared to Market
       </Typography>
-      <div>
-      </div>
+
     </React.Fragment>
   );
 }
