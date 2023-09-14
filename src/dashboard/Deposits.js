@@ -1,11 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react';
-import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Title from './Title';
-import { MyArrayContext, MyArrayProvider } from '../state/context';
+import { MyArrayContext } from '../state/context';
 // import yahooFinance from "yahoo-finance";
 export default function Deposits() {
-  const { myArray, updateArray } = useContext(MyArrayContext);  
+  const { myArray } = useContext(MyArrayContext);  
   const [count, setCount] = useState()
   useEffect( () => {
     async function fetchData() {
@@ -20,13 +19,15 @@ export default function Deposits() {
           let singleWeightedBeta = singleBeta * (1 / myArray.length)
           //calculate totalBeta
           totalBeta = totalBeta + singleWeightedBeta
+          return null
         })
       }
       //calculate the normalized percentage 
       betaPercentage = 100 * ((totalBeta - minBeta) / (maxBeta - minBeta))
       setCount(Math.floor(betaPercentage))
     }
-    fetchData()
+    if(myArray.length > 0) { fetchData()}
+    else setCount(0)
 }, [myArray]);
   return (
     <React.Fragment>

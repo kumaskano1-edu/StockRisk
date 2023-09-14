@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useContext} from 'react';
+import React, { useContext} from 'react';
 import { MyArrayContext } from '../state/context';
 
-import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -12,7 +11,6 @@ import Button from '@mui/material/Button';
 
 export default function Orders() {
   const { myArray, updateArray } = useContext(MyArrayContext);  
-  const [rerender, setRerender] = useState(false);
 
   const onRemoveClick = (symbol) =>{
 

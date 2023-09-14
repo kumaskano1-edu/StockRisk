@@ -1,55 +1,91 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Line } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
+import React, {useContext, useEffect, useState} from 'react';
+import { useTheme } from '@mui/material/styles';
+import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
+import Title from './Title';
+import { MyArrayContext } from '../state/context';
 
-const PortfolioChart = ({ portfolioData }) => {
-  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+export default function Chart() {
+  const theme = useTheme();
+  const [chartData, setChartData] = useState([]);
+  const { myArray } = useContext(MyArrayContext);  
 
-  useEffect(() => {
-    // Replace 'YOUR_API_KEY' with your FinHub API key
-    const apiKey = 'cjuao3hr01qlodk31tq0cjuao3hr01qlodk31tqg';
-
-    // Define the start and end timestamps for your desired time period
-    const startTime = 1609459200; // Replace with your start timestamp
-    const endTime = 1621363200; // Replace with your end timestamp
-
-    // Create an array to store data for each stock
-    const stockDataPromises = portfolioData.map((stock) => {
-      const apiUrl = `https://finnhub.io/api/v1/stock/candle?symbol=${stock.symbol}&resolution=1&from=${startTime}&to=${endTime}&token=${apiKey}`;
-      return axios.get(apiUrl);
-    });
-
-    // Fetch data for each stock concurrently
-    Promise.all(stockDataPromises)
-      .then((responses) => {
-        const newChartData = {
-          labels: responses[0].data.t.map((timestamp) => new Date(timestamp * 1000).toLocaleDateString()),
-          datasets: [],
-        };
-
-        responses.forEach((response, index) => {
-          newChartData.datasets.push({
-            label: portfolioData[index].symbol,
-            data: response.data.c,
-            fill: false,
-            borderColor: 'black', // Function to generate random colors
-          });
-        });
-
-        setChartData(newChartData);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
+  // Function to calculate the aggregated performance of the portfolio
+  const calculatePortfolioPerformance = () => {
+    try {
+      // Extract the stock data arrays and ensure they all have the same length
+      const stockDataArray = myArray.map((stock) => stock.c);
+      const maxLength = Math.max(...stockDataArray.map(data => data.length));
+      const normalizedData = stockDataArray.map(data => {
+        if (data.length < maxLength) {
+          const padding = new Array(maxLength - data.length).fill(0);
+          return [...data, ...padding];
+        }
+        return data;
       });
-  }, [portfolioData]);
+  
+      // Sum the values for each time point
+      const aggregatedData = Array.from({ length: maxLength }, (_, index) => ({
+        time: `Time ${index}`,
+        amount: normalizedData.reduce((sum, data) => sum + data[index], 0)
+      }));
+  
+      return aggregatedData;
+    } catch (error) {
+      console.error('Error calculating portfolio performance:', error);
+      return [];
+    }
+  };
+   useEffect(() => {
+   if(myArray.length > 0) {
+   const data = calculatePortfolioPerformance()
+   setChartData(data)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myArray]);
 
   return (
-    <div className="portfolio-chart">
-      <h2>Portfolio Performance</h2>
-      <Line data={chartData} />
-    </div>
+    <React.Fragment>
+      <Title>Portfolio Performance</Title>
+      <ResponsiveContainer>
+        <LineChart
+          data={chartData}
+          margin={{
+            top: 16,
+            right: 16,
+            bottom: 0,
+            left: 24,
+          }}
+        >
+          <XAxis
+            dataKey="time"
+            stroke={theme.palette.text.secondary}
+            style={theme.typography.body2}
+          />
+          <YAxis
+            stroke={theme.palette.text.secondary}
+            style={theme.typography.body2}
+          >
+            <Label
+              angle={270}
+              position="left"
+              style={{
+                textAnchor: 'middle',
+                fill: theme.palette.text.primary,
+                ...theme.typography.body1,
+              }}
+            >
+              Stock Price ($)
+            </Label>
+          </YAxis>
+          <Line
+            isAnimationActive={false}
+            type="monotone"
+            dataKey="amount"
+            stroke={theme.palette.primary.main}
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </React.Fragment>
   );
-};
-
-export default PortfolioChart;
+}

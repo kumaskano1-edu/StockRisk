@@ -1,13 +1,9 @@
 import React, { useEffect, useState, useContext} from 'react';
 import { MyArrayContext } from '../state/context';
 import TextField from '@mui/material/TextField';
-import StockList from '../components/StockList';
 import useDebounce from '../hooks/useDebounce';
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-import { TabOutlined, TableView } from '@mui/icons-material';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
@@ -21,14 +17,14 @@ export default function SearchBar() {
     const [loading, setLoading] = useState(false)
     const debouncedSearch = useDebounce(search, 500)
     const { myArray, updateArray } = useContext(MyArrayContext);  
-    const apiKey = 'cjuao3hr01qlodk31tq0cjuao3hr01qlodk31tqg';
+    const apiKey = process.env.REACT_APP_API;
 
   useEffect( () => {
+
     async function fetchData() {
       setLoading(true)
       if(search) {
-        const data = await fetch(`https://finnhub.io/api/v1/search?q=${debouncedSearch}&token=${apiKey}`).
-        then((res) => res.json())
+        const data = await fetch(`https://finnhub.io/api/v1/search?q=${debouncedSearch}&token=${apiKey}`).then((res) => res.json())
 
         if (data.result) {
             const matches = data.result;
@@ -36,9 +32,12 @@ export default function SearchBar() {
         }
       }
       setLoading(false)
+      
 
     }
     if(debouncedSearch) fetchData()
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+     // eslint-disable-next-line
 }, [debouncedSearch]);
     const eraseButton = () => { 
       setSearch('');
@@ -46,12 +45,16 @@ export default function SearchBar() {
     }
     const handleAddItem = async(stock) => {
         let uniqueSymbol = stock.symbol
+        if(loading){
+          console.log('loading')
+        }
         if(!myArray.some(item => uniqueSymbol === item.symbol)) {
-            let stockFinances = await fetch(`https://finnhub.io/api/v1/stock/metric?symbol=${uniqueSymbol}&metric=all&token=${apiKey}`).
-            then((res) => res.json())
+            let stockFinances = await fetch(`https://finnhub.io/api/v1/stock/metric?symbol=${uniqueSymbol}&metric=all&token=${apiKey}`).then((res) => res.json())
+            let chartData = await fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${uniqueSymbol}&resolution=1&from=1609459200&to=1621363200&token=${apiKey}`).then((res) => res.json())
             let stockSkeleton = {
               ...stock,
-              ...stockFinances
+              ...stockFinances,
+              ...chartData
             }
             console.log(stockSkeleton)
             const newArray = [...myArray, stockSkeleton];
