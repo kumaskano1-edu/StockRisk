@@ -4,7 +4,6 @@ import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recha
 import Title from './Title';
 import { MyArrayContext } from '../state/context';
 import {LoadingContext} from '../state/loading'
-import LoadingComponent from './LoadingComponent';
 export default function Chart() {
   const theme = useTheme();
   const [chartData, setChartData] = useState([]);

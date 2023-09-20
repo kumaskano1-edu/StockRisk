@@ -14,7 +14,6 @@ import Deposits from './Deposits';
 import Orders from './Orders';
 import SearchBar from './SearchBar';
 import { MyArrayContext } from '../state/context';
-import LoadingComponent from './LoadingComponent';
 import { LoadingContext } from '../state/loading';
 function Copyright(props) {
   return (
@@ -55,7 +54,6 @@ const defaultTheme = createTheme();
 
 export default function Dashboard() {
   const { myArray } = useContext(MyArrayContext);  
-  const {isLoading} = useContext(LoadingContext)
   return (
     <ThemeProvider theme={defaultTheme}>
     <Box sx={{ display: 'flex' }}><CssBaseline />
