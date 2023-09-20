@@ -1,5 +1,5 @@
 {
-  "name": "Portfolio Risk Calculator",
+  "name": "PortfolioRiskCalculator",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
