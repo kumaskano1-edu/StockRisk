@@ -14,7 +14,6 @@ import Deposits from './Deposits';
 import Orders from './Orders';
 import SearchBar from './SearchBar';
 import { MyArrayContext } from '../state/context';
-import { LoadingContext } from '../state/loading';
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
