@@ -3,12 +3,13 @@ import { useTheme } from '@mui/material/styles';
 import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
 import Title from './Title';
 import { MyArrayContext } from '../state/context';
-
+import {LoadingContext} from '../state/loading'
+import LoadingComponent from './LoadingComponent';
 export default function Chart() {
   const theme = useTheme();
   const [chartData, setChartData] = useState([]);
   const { myArray } = useContext(MyArrayContext);  
-
+  const {isLoading, setLoading} = useContext(LoadingContext)
   // Function to calculate the aggregated performance of the portfolio
   const calculatePortfolioPerformance = () => {
     try {
@@ -37,16 +38,23 @@ export default function Chart() {
   };
    useEffect(() => {
    if(myArray.length > 0) {
+   setLoading(true)
    const data = calculatePortfolioPerformance()
    setChartData(data)
+   setTimeout(() => {
+    setLoading(false); // Set loading to false when the operation is complete
+  }, 2000);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myArray]);
-
+  const chartStyle = {
+    display: isLoading ? 'block' : 'none',
+    // Add any other styles you want here
+  };
   return (
     <React.Fragment>
       <Title>Portfolio Performance</Title>
-      <ResponsiveContainer>
+      <ResponsiveContainer style={chartStyle}>
         <LineChart
           data={chartData}
           margin={{
